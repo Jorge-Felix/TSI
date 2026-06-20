@@ -217,6 +217,8 @@ def preprocess(report: dict[str, Any]) -> dict[str, Any]:
         "filesystem_artifacts": filter_filesystem(report.get("filesystem", [])),
         "registry_artifacts": filter_registry(report.get("registry", [])),
         "process_tree": build_process_tree(report.get("processes", [])),
+        # La inteligencia de abuse.ch pasa sin filtrar: ya viene destilada
+        "enrichment": report.get("enrichment"),
     }
     processed["token_count_estimate"] = estimate_tokens(processed)
 

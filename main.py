@@ -19,6 +19,7 @@ from rich.text import Text
 import config
 from pipeline import (
     claude_client,
+    enrichment,
     output_generator,
     output_parser,
     prompt_builder,
@@ -46,6 +47,8 @@ def parse_args() -> argparse.Namespace:
                         help="Versión del system prompt en prompts/ (default: %(default)s)")
     parser.add_argument("--dry-run", action="store_true",
                         help="Ejecuta capas 1-3 e imprime el prompt sin llamar a la API")
+    parser.add_argument("--no-enrich", action="store_true",
+                        help="Omite el enriquecimiento con abuse.ch (MalwareBazaar/ThreatFox)")
     parser.add_argument("-v", "--verbose", action="store_true", help="Logging DEBUG")
     return parser.parse_args()
 
@@ -59,6 +62,10 @@ def print_summary(result: dict, paths: dict) -> None:
         f"Score: {sample.get('score', '?')}/100",
         title="Comportamiento principal", border_style="red",
     ))
+
+    if result.get("narrative"):
+        console.print(Panel(Text(result["narrative"].strip()),
+                            title="Análisis narrativo", border_style="cyan"))
 
     ttp_table = Table(title=f"TTPs detectadas ({len(result['ttps'])})")
     ttp_table.add_column("Táctica", style="cyan")
@@ -103,6 +110,11 @@ def main() -> int:
             sample_name=args.sample, sample_id=args.sample_id,
             sample_hash=args.sample_hash,
         )
+
+        # Enriquecimiento — abuse.ch (entre Capa 1 y 2, degrada con gracia)
+        if not args.no_enrich and report.get("sample_hash"):
+            console.print("[dim]\\[+] Enriqueciendo contexto (abuse.ch)...[/dim]")
+            report["enrichment"] = enrichment.enrich(report["sample_hash"])
 
         # Capa 2 — Preprocesamiento
         console.print("[dim]\\[2/6] Preprocesando (filtrado de ruido)...[/dim]")

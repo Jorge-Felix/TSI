@@ -30,6 +30,7 @@ def _empty_report(source: str) -> dict[str, Any]:
         "registry": [],
         "signatures": [],
         "raw_syscalls": [],
+        "enrichment": None,  # lo rellena la capa de enriquecimiento (abuse.ch)
     }
 
 

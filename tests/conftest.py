@@ -155,6 +155,55 @@ def virustotal_file_info():
 
 
 @pytest.fixture
+def malwarebazaar_raw():
+    """Respuesta de MalwareBazaar get_info."""
+    return {
+        "query_status": "ok",
+        "data": [
+            {
+                "sha256_hash": "abc123" + "0" * 58,
+                "file_type": "exe",
+                "signature": "RedLineStealer",
+                "tags": ["exe", "RedLine", "stealer"],
+                "delivery_method": "web_download",
+                "first_seen": "2024-01-15 10:00:00",
+                "yara_rules": [
+                    {"rule_name": "win_redline_stealer"},
+                    {"rule_name": "INDICATOR_EXE_Packed"},
+                ],
+                "vendor_intel": {"VirusTotal": {}, "ANY.RUN": {}, "Triage": {}},
+            }
+        ],
+    }
+
+
+@pytest.fixture
+def threatfox_raw():
+    """Respuesta de ThreatFox search_hash."""
+    return {
+        "query_status": "ok",
+        "data": [
+            {
+                "ioc": "185.234.10.10:4782",
+                "ioc_type": "ip:port",
+                "malware": "win.redline_stealer",
+                "malware_printable": "RedLine Stealer",
+                "threat_type": "botnet_cc",
+                "confidence_level": 75,
+            },
+            {
+                "ioc": "evil-c2.com",
+                "ioc_type": "domain",
+                "malware": "win.redline_stealer",
+                "malware_printable": "RedLine Stealer",
+                "threat_type": "botnet_cc",
+                "confidence_level": 90,
+            },
+        ],
+    }
+
+
+@pytest.fixture
 def claude_response():
     return '''```json
 {

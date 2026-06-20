@@ -29,6 +29,11 @@ TRIAGE_API_BASE = "https://tria.ge/api/v0"
 VIRUSTOTAL_API_KEY = os.getenv("VIRUSTOTAL_API_KEY", "")
 VT_API_BASE = "https://www.virustotal.com/api/v3"
 
+# --- abuse.ch: MalwareBazaar + ThreatFox (enriquecimiento, un solo Auth-Key) ---
+ABUSECH_AUTH_KEY = os.getenv("ABUSECH_AUTH_KEY", "")
+MALWAREBAZAAR_API = "https://mb-api.abuse.ch/api/v1/"
+THREATFOX_API = "https://threatfox-api.abuse.ch/api/v1/"
+
 # --- Fuentes y rutas ---
 DEFAULT_SOURCE = os.getenv("DEFAULT_SOURCE", "fixture")  # any_run | triage | fixture
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", str(PROJECT_ROOT / "output")))

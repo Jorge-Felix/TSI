@@ -69,7 +69,50 @@ def build_user_message(processed: dict[str, Any]) -> str:
     else:
         sections.append("(ninguno relevante)")
 
+    sections += _build_enrichment_section(processed.get("enrichment"))
+
     return "\n".join(sections)
+
+
+def _build_enrichment_section(enrichment: dict | None) -> list[str]:
+    """Bloque de inteligencia externa (abuse.ch). Vacío si no hay datos."""
+    if not enrichment or not enrichment.get("available"):
+        return []
+
+    lines = ["", "## INTELIGENCIA DE AMENAZAS (fuentes externas)",
+             "Datos de terceros para corroborar el análisis. Úsalos para "
+             "confirmar familia e IOCs conocidos, no como sustituto de la "
+             "evidencia del sandbox."]
+
+    mb = enrichment.get("malware_bazaar", {})
+    if mb.get("found"):
+        lines.append("\n### MalwareBazaar (abuse.ch)")
+        if mb.get("signature"):
+            lines.append(f"- Familia atribuida: {mb['signature']}")
+        if mb.get("tags"):
+            lines.append(f"- Tags: {', '.join(mb['tags'])}")
+        if mb.get("file_type"):
+            lines.append(f"- Tipo de archivo: {mb['file_type']}")
+        if mb.get("delivery_method"):
+            lines.append(f"- Método de entrega: {mb['delivery_method']}")
+        if mb.get("yara_rules"):
+            lines.append(f"- Reglas YARA: {', '.join(mb['yara_rules'])}")
+        if mb.get("vendor_intel"):
+            lines.append(f"- Reportado por: {', '.join(mb['vendor_intel'])}")
+
+    tf = enrichment.get("threatfox", {})
+    if tf.get("found"):
+        lines.append("\n### ThreatFox (abuse.ch) — IOCs conocidos")
+        if tf.get("malware_families"):
+            lines.append(f"- Familias asociadas: {', '.join(tf['malware_families'])}")
+        for ioc in tf.get("iocs", [])[:15]:
+            lines.append(
+                f"- [{ioc['ioc_type']}] {ioc['ioc']} "
+                f"(familia: {ioc['malware']}, confianza: {ioc['confidence']}%, "
+                f"tipo: {ioc['threat_type']})"
+            )
+
+    return lines
 
 
 def build_prompt(processed: dict[str, Any],

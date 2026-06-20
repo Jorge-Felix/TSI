@@ -51,6 +51,18 @@ python main.py --source fixture --sample remcos_rat_sample --dry-run
 Cada fuente se normaliza al mismo `ReportModel` en la Capa 1, así que el resto
 del pipeline es idéntico para todas.
 
+## Enriquecimiento de contexto (abuse.ch)
+
+Entre la Capa 1 y la 2, el pipeline enriquece la muestra con inteligencia de
+**MalwareBazaar** (atribución de familia, tags, reglas YARA, vendors) y
+**ThreatFox** (IOCs/C2 conocidos) — ambos de abuse.ch con un solo Auth-Key
+gratuito de [auth.abuse.ch](https://auth.abuse.ch). Esto se inyecta en el prompt
+como una sección `## INTELIGENCIA DE AMENAZAS` para que Claude corrobore familia
+e IOCs en vez de especular.
+
+- Se activa solo si `ABUSECH_AUTH_KEY` está en `.env`; degrada con gracia si no.
+- Desactívalo con `--no-enrich`.
+
 ## Outputs (en `output/`)
 
 | Archivo | Propósito |
