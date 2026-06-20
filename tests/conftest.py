@@ -204,6 +204,38 @@ def threatfox_raw():
 
 
 @pytest.fixture
+def threatfox_ioc_raw():
+    """Respuesta de ThreatFox search_ioc (pivote sobre una IP/dominio)."""
+    return {
+        "query_status": "ok",
+        "data": [
+            {
+                "ioc": "129.121.114.124",
+                "malware": "elf.mirai",
+                "malware_printable": "Mirai",
+                "threat_type": "botnet_cc",
+                "confidence_level": 100,
+            }
+        ],
+    }
+
+
+@pytest.fixture
+def urlhaus_host_raw():
+    """Respuesta de URLhaus host lookup."""
+    return {
+        "query_status": "ok",
+        "url_count": "7",
+        "urls": [
+            {"url": "http://129.121.114.124/vl0", "threat": "malware_download",
+             "tags": ["elf", "mirai"]},
+            {"url": "http://129.121.114.124/g0G", "threat": "malware_download",
+             "tags": ["32-bit"]},
+        ],
+    }
+
+
+@pytest.fixture
 def claude_response():
     return '''```json
 {

@@ -33,6 +33,11 @@ VT_API_BASE = "https://www.virustotal.com/api/v3"
 ABUSECH_AUTH_KEY = os.getenv("ABUSECH_AUTH_KEY", "")
 MALWAREBAZAAR_API = "https://mb-api.abuse.ch/api/v1/"
 THREATFOX_API = "https://threatfox-api.abuse.ch/api/v1/"
+URLHAUS_API = "https://urlhaus-api.abuse.ch/v1/host/"
+
+# Máximo de IOCs a pivotear por tipo (respeta el fair-use de abuse.ch)
+PIVOT_MAX_IPS = 5
+PIVOT_MAX_DOMAINS = 5
 
 # --- Fuentes y rutas ---
 DEFAULT_SOURCE = os.getenv("DEFAULT_SOURCE", "fixture")  # any_run | triage | fixture

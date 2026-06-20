@@ -42,6 +42,29 @@ def test_extracts_narrative(claude_response):
     assert "|" not in result["narrative"]  # la tabla no se cuela en la narrativa
 
 
+def test_narrative_strips_markdown_headers():
+    raw = '''```json
+{"behavior_summary": "x", "ttps": [], "malware_family": "Y", "threat_category": "RAT"}
+```
+---
+
+## Narrativa Técnica
+
+Este es el análisis real escrito en un párrafo corrido.
+
+## IOCs
+
+| Tipo | Valor | Confianza | Contexto |
+|------|-------|-----------|----------|
+| IP | 1.2.3.4 | Alta | C2 |
+'''
+    result = output_parser.parse(raw)
+    assert "Narrativa Técnica" not in result["narrative"]
+    assert "##" not in result["narrative"]
+    assert "---" not in result["narrative"]
+    assert "análisis real" in result["narrative"]
+
+
 def test_metrics_passthrough(claude_response):
     result = output_parser.parse(claude_response,
                                  {"cost_usd": 0.0123, "response_time_s": 4.5})

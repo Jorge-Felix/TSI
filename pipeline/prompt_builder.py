@@ -11,7 +11,7 @@ import config
 
 logger = logging.getLogger(__name__)
 
-PROMPT_VERSION = "mitre_analyst_v1"
+PROMPT_VERSION = "mitre_analyst_v2"
 
 
 def load_system_prompt(version: str = PROMPT_VERSION) -> str:
@@ -102,7 +102,7 @@ def _build_enrichment_section(enrichment: dict | None) -> list[str]:
 
     tf = enrichment.get("threatfox", {})
     if tf.get("found"):
-        lines.append("\n### ThreatFox (abuse.ch) — IOCs conocidos")
+        lines.append("\n### ThreatFox (abuse.ch) — IOCs conocidos de esta muestra")
         if tf.get("malware_families"):
             lines.append(f"- Familias asociadas: {', '.join(tf['malware_families'])}")
         for ioc in tf.get("iocs", [])[:15]:
@@ -110,6 +110,24 @@ def _build_enrichment_section(enrichment: dict | None) -> list[str]:
                 f"- [{ioc['ioc_type']}] {ioc['ioc']} "
                 f"(familia: {ioc['malware']}, confianza: {ioc['confidence']}%, "
                 f"tipo: {ioc['threat_type']})"
+            )
+
+    pivot = enrichment.get("ioc_pivot", {})
+    if pivot.get("found"):
+        lines.append("\n### Reputación de infraestructura (pivote sobre IOCs de red)")
+        lines.append("Resultado de buscar las IPs/dominios observados en bases de "
+                     "datos de amenazas. Eleva un IOC de 'observado' a 'confirmado'.")
+        for hit in pivot.get("threatfox", []):
+            lines.append(
+                f"- ThreatFox: {hit['ioc']} → {hit['malware']} "
+                f"({hit['threat_type']}, confianza {hit['confidence']}%) — C2/IOC confirmado"
+            )
+        for hit in pivot.get("urlhaus", []):
+            threats = ", ".join(hit.get("threats", [])) or "actividad maliciosa"
+            tags = f" [{', '.join(hit['tags'])}]" if hit.get("tags") else ""
+            lines.append(
+                f"- URLhaus: {hit['host']} → {threats}{tags} "
+                f"({hit.get('url_count', 0)} URLs maliciosas conocidas)"
             )
 
     return lines

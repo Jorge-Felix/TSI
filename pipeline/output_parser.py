@@ -44,7 +44,9 @@ def extract_json_block(raw: str) -> dict[str, Any]:
 
 
 def extract_narrative(raw: str) -> str:
-    """Texto entre el cierre del bloque JSON y el inicio de la tabla de IOCs."""
+    """Texto entre el cierre del bloque JSON y el inicio de la tabla de IOCs,
+    limpiando separadores, encabezados markdown y rótulos de sección que Claude
+    a veces incluye (## Narrativa, ## IOCs, SECCIÓN 2, ---)."""
     after_json = raw
     match = JSON_BLOCK_RE.search(raw)
     if match:
@@ -53,12 +55,18 @@ def extract_narrative(raw: str) -> str:
     lines = []
     for line in after_json.splitlines():
         if TABLE_ROW_RE.match(line):
-            break
+            break  # empieza la tabla de IOCs
+        stripped = line.strip()
+        if stripped in ("---", "***", "___"):
+            continue  # separador horizontal markdown
+        if re.match(r"#{1,6}\s", stripped):
+            continue  # encabezado markdown (## Narrativa Técnica, ## IOCs, ...)
+        if re.match(r"SECCI[OÓ]N\s*\d", stripped, re.IGNORECASE):
+            continue  # rótulo "SECCIÓN N"
         lines.append(line)
+
     narrative = "\n".join(lines).strip()
-    # Limpia encabezados tipo "SECCIÓN 2:" o "## Narrativa"
-    narrative = re.sub(r"^(#+\s*.*|SECCI[OÓ]N\s*\d.*?:?)\s*\n", "", narrative,
-                       flags=re.IGNORECASE)
+    narrative = re.sub(r"\n{3,}", "\n\n", narrative)  # colapsar líneas en blanco
     return narrative.strip()
 
 

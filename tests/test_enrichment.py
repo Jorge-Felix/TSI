@@ -33,6 +33,32 @@ def test_threatfox_no_result():
     assert tf["found"] is False
 
 
+# ------------------------------------------------- pivote de IOCs (red) ---
+
+def test_threatfox_ioc_parse(threatfox_ioc_raw):
+    r = enrichment.parse_threatfox_ioc(threatfox_ioc_raw)
+    assert r["found"] is True
+    assert r["malware"] == "Mirai"
+    assert r["threat_type"] == "botnet_cc"
+    assert r["confidence"] == 100
+
+
+def test_threatfox_ioc_no_result():
+    assert enrichment.parse_threatfox_ioc({"query_status": "no_result"})["found"] is False
+
+
+def test_urlhaus_host_parse(urlhaus_host_raw):
+    r = enrichment.parse_urlhaus_host(urlhaus_host_raw)
+    assert r["found"] is True
+    assert r["url_count"] == 7
+    assert "malware_download" in r["threats"]
+    assert "mirai" in r["tags"]
+
+
+def test_urlhaus_host_not_found():
+    assert enrichment.parse_urlhaus_host({"query_status": "no_results"})["found"] is False
+
+
 # ---------------------------------------------- degradación con gracia ---
 
 def test_enrich_without_key(monkeypatch):
@@ -78,3 +104,23 @@ def test_prompt_enrichment_section_present():
 def test_prompt_enrichment_section_empty_when_unavailable():
     assert prompt_builder._build_enrichment_section(None) == []
     assert prompt_builder._build_enrichment_section({"available": False}) == []
+
+
+def test_prompt_ioc_pivot_section():
+    enrich = {
+        "available": True,
+        "malware_bazaar": {"found": False},
+        "threatfox": {"found": False},
+        "ioc_pivot": {
+            "found": True,
+            "threatfox": [{"ioc": "129.121.114.124", "malware": "Mirai",
+                           "threat_type": "botnet_cc", "confidence": 100}],
+            "urlhaus": [{"host": "129.121.114.124", "threats": ["malware_download"],
+                         "tags": ["mirai"], "url_count": 7}],
+        },
+    }
+    text = "\n".join(prompt_builder._build_enrichment_section(enrich))
+    assert "infraestructura" in text.lower()
+    assert "Mirai" in text
+    assert "129.121.114.124" in text
+    assert "URLhaus" in text

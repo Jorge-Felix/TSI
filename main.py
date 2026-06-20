@@ -114,7 +114,8 @@ def main() -> int:
         # Enriquecimiento — abuse.ch (entre Capa 1 y 2, degrada con gracia)
         if not args.no_enrich and report.get("sample_hash"):
             console.print("[dim]\\[+] Enriqueciendo contexto (abuse.ch)...[/dim]")
-            report["enrichment"] = enrichment.enrich(report["sample_hash"])
+            report["enrichment"] = enrichment.enrich(
+                report["sample_hash"], report.get("network"))
 
         # Capa 2 — Preprocesamiento
         console.print("[dim]\\[2/6] Preprocesando (filtrado de ruido)...[/dim]")
