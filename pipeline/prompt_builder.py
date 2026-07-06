@@ -70,8 +70,24 @@ def build_user_message(processed: dict[str, Any]) -> str:
         sections.append("(ninguno relevante)")
 
     sections += _build_enrichment_section(processed.get("enrichment"))
+    sections += _build_anyrun_section(processed.get("anyrun_context"))
 
     return "\n".join(sections)
+
+
+def _build_anyrun_section(anyrun_context: str | None) -> list[str]:
+    """Bloque de contexto de apoyo del reporte ANY.RUN. Vacío si no se adjuntó."""
+    if not anyrun_context:
+        return []
+    return [
+        "",
+        "## CONTEXTO ADICIONAL — Reporte ANY.RUN (aportado por el analista)",
+        "Contexto de APOYO opcional, ya filtrado. La fuente primaria del análisis "
+        "sigue siendo el reporte de VirusTotal de arriba; usa esto solo para "
+        "corroborar o añadir detalle, no como evidencia principal.",
+        "",
+        anyrun_context,
+    ]
 
 
 def _build_enrichment_section(enrichment: dict | None) -> list[str]:

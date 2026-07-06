@@ -39,6 +39,10 @@ URLHAUS_API = "https://urlhaus-api.abuse.ch/v1/host/"
 PIVOT_MAX_IPS = 5
 PIVOT_MAX_DOMAINS = 5
 
+# --- Adjunto opcional: reporte de ANY.RUN (contexto de apoyo) ---
+# Presupuesto de tokens para el reporte ANY.RUN ya condensado
+ANYRUN_MAX_CONTEXT_TOKENS = 4000
+
 # --- Fuentes y rutas ---
 DEFAULT_SOURCE = os.getenv("DEFAULT_SOURCE", "fixture")  # any_run | triage | fixture
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", str(PROJECT_ROOT / "output")))

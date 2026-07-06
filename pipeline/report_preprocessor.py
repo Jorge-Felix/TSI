@@ -219,6 +219,8 @@ def preprocess(report: dict[str, Any]) -> dict[str, Any]:
         "process_tree": build_process_tree(report.get("processes", [])),
         # La inteligencia de abuse.ch pasa sin filtrar: ya viene destilada
         "enrichment": report.get("enrichment"),
+        # El reporte ANY.RUN ya viene condensado por su propia capa
+        "anyrun_context": report.get("anyrun_context"),
     }
     processed["token_count_estimate"] = estimate_tokens(processed)
 

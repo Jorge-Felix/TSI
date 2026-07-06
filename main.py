@@ -18,6 +18,7 @@ from rich.text import Text
 
 import config
 from pipeline import (
+    anyrun_report,
     claude_client,
     enrichment,
     output_generator,
@@ -49,6 +50,9 @@ def parse_args() -> argparse.Namespace:
                         help="Ejecuta capas 1-3 e imprime el prompt sin llamar a la API")
     parser.add_argument("--no-enrich", action="store_true",
                         help="Omite el enriquecimiento con abuse.ch (MalwareBazaar/ThreatFox)")
+    parser.add_argument("--anyrun-report", dest="anyrun_report",
+                        help="Ruta a un reporte de ANY.RUN (PDF/HTML/txt) como "
+                             "contexto de apoyo opcional. VirusTotal sigue siendo obligatorio.")
     parser.add_argument("-v", "--verbose", action="store_true", help="Logging DEBUG")
     return parser.parse_args()
 
@@ -116,6 +120,15 @@ def main() -> int:
             console.print("[dim]\\[+] Enriqueciendo contexto (abuse.ch)...[/dim]")
             report["enrichment"] = enrichment.enrich(
                 report["sample_hash"], report.get("network"))
+
+        # Adjunto opcional — reporte ANY.RUN como contexto de apoyo
+        if args.anyrun_report:
+            console.print("[dim]\\[+] Procesando reporte ANY.RUN (contexto de apoyo)...[/dim]")
+            ctx = anyrun_report.extract_context(args.anyrun_report)
+            report["anyrun_context"] = ctx
+            if ctx is None:
+                console.print("[yellow]Aviso: no se pudo usar el reporte ANY.RUN; "
+                              "se continúa solo con VirusTotal.[/yellow]")
 
         # Capa 2 — Preprocesamiento
         console.print("[dim]\\[2/6] Preprocesando (filtrado de ruido)...[/dim]")

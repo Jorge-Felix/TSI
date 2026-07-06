@@ -31,6 +31,7 @@ def _empty_report(source: str) -> dict[str, Any]:
         "signatures": [],
         "raw_syscalls": [],
         "enrichment": None,  # lo rellena la capa de enriquecimiento (abuse.ch)
+        "anyrun_context": None,  # reporte ANY.RUN opcional condensado (apoyo)
     }
 
 

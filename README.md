@@ -63,6 +63,22 @@ e IOCs en vez de especular.
 - Se activa solo si `ABUSECH_AUTH_KEY` está en `.env`; degrada con gracia si no.
 - Desactívalo con `--no-enrich`.
 
+## Reporte ANY.RUN como contexto de apoyo (opcional)
+
+Puedes adjuntar un reporte de ANY.RUN (PDF/HTML/txt) para dar más contexto al
+modelo. **VirusTotal sigue siendo obligatorio**; ANY.RUN es estrictamente de
+apoyo. El reporte se convierte a texto (pypdf/BeautifulSoup), se filtra a las
+secciones relevantes para malware y se recorta a un presupuesto de tokens antes
+de llegar al modelo, para economizar.
+
+```bash
+python main.py --source virustotal --hash <sha256> --anyrun-report C:/ruta/reporte.pdf
+```
+
+Si el archivo no existe o no se puede procesar, el pipeline continúa solo con
+VirusTotal. El motor de extracción está desacoplado (`pipeline/anyrun_report.py`),
+así que cambiarlo por Docling u otra herramienta es reemplazar una sola función.
+
 ## Outputs (en `output/`)
 
 | Archivo | Propósito |
