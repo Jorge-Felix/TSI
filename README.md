@@ -1,8 +1,7 @@
 # Sandbox TL;DR
 
 **Automated Sandbox Report Summarization & TTP Extraction via LLM**
-Proyecto Final de Grado TSI — ITLA · B5-LABS / Never Off
-
+Proyecto Final de Grado TSI — ITLA
 Pipeline Python de 6 capas que ingiere reportes JSON de plataformas de sandbox
 (Any.run, Triage), filtra el ruido, y usa Claude API para extraer TTPs mapeadas
 a MITRE ATT&CK e IOCs accionables. Reduce el triaje manual de 30-60 minutos a
